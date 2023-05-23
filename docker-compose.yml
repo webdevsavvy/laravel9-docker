@@ -1,0 +1,31 @@
+version: '3.8'
+
+networks:
+  app-network:
+
+volumes:
+  app-data:
+
+services:
+  webserver:
+    image: nginx:1.23.4-alpine
+    container_name: webserver
+    restart: unless-stopped
+    ports:
+      - "80:80"
+    volumes:
+      - ./laravel9/:/var/www/laravel9
+      - .docker/server/conf:/etc/nginx/conf.d
+    networks:
+      - app-network
+      
+  backend:
+    build:
+      context: .docker/php
+      dockerfile: dockerfile
+    container_name: backend
+    volumes:
+      - ./laravel9/:/var/www/laravel9
+      - .docker/php/conf/php.ini:/usr/local/etc/php/conf.d/local.ini
+    networks:
+      - app-network
